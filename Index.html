@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Arshu's Treasure Hunt 💎</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#07070b;color:#f5ead0;
+ font-family:Georgia,serif;overflow-x:hidden;
+}
+body:before{
+ content:"";position:fixed;inset:0;pointer-events:none;
+ background:
+ radial-gradient(circle at 50% 20%,rgba(150,110,45,.15),transparent 35%),
+ radial-gradient(circle at 20% 80%,rgba(90,50,100,.08),transparent 30%);
+}
+#app{
+ min-height:100vh;display:flex;align-items:center;
+ justify-content:center;padding:20px;
+}
+.screen{
+ width:min(700px,94vw);min-height:80vh;
+ display:flex;align-items:center;justify-content:center;
+ text-align:center;position:relative;
+}
+.box{
+ width:100%;padding:35px 22px;border:1px solid #8f6b36;
+ border-radius:25px;background:rgba(12,11,17,.94);
+ box-shadow:0 0 50px rgba(0,0,0,.9),0 0 35px rgba(170,125,45,.08);
+ animation:appear .8s ease;
+}
+@keyframes appear{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(34px,9vw,60px);color:#e5c06b;margin:8px 0}
+h2{font-size:clamp(27px,7vw,42px);color:#e5c06b}
+p{font-size:18px;line-height:1.7}
+.gold{color:#e5c06b}
+.small{opacity:.65;font-size:14px}
+button{
+ background:#17120c;color:#f4d98f;border:1px solid #a37a36;
+ padding:14px 25px;border-radius:30px;font-size:16px;
+ cursor:pointer;margin:7px;transition:.25s;
+}
+button:hover{transform:translateY(-2px);background:#29200f}
+input{
+ width:min(500px,90%);padding:15px;border-radius:15px;
+ border:1px solid #a37a36;background:#0b0a0e;
+ color:white;text-align:center;font-size:18px;outline:none;
+}
+.key{font-size:58px}
+.choice{display:block;width:min(560px,100%);margin:12px auto}
+.correct{color:#d9b75e;font-size:21px}
+.wrong{color:#d98282}
+.hidden{display:none!important}
+
+#musicBtn{
+ position:fixed;top:15px;right:15px;z-index:5;
+ font-size:13px;padding:10px 15px;
+}
+
+.progress{
+ position:fixed;top:15px;left:15px;
+ color:#cba95d;font-size:13px;z-index:5;
+}
+
+.letter{
+ background:linear-gradient(135deg,#d8c28f,#bca46c);
+ color:#302313;padding:32px 24px;
+ border-radius:7px;text-align:left;
+ box-shadow:0 20px 60px #000;
+ animation:unfold 1.1s ease;
+}
+@keyframes unfold{
+ 0%{transform:perspective(700px) rotateX(-90deg);opacity:0}
+ 100%{transform:perspective(700px) rotateX(0);opacity:1}
+}
+.letter h2{text-align:center;color:#392714}
+.letter p{font-size:18px}
+.coin{
+ text-align:center;font-size:72px;
+ animation:float 2s ease-in-out infinite;
+}
+@keyframes float{50%{transform:translateY(-10px)}}
+
+.particle{
+ position:fixed;width:3px;height:3px;border-radius:50%;
+ background:#d8b25d;pointer-events:none;
+ animation:fall linear infinite;opacity:.6;
+}
+@keyframes fall{
+ from{transform:translateY(-10vh);opacity:0}
+ 20%{opacity:.7}
+ to{transform:translateY(110vh);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="music" src="tera_naam_doon.mp3" loop></audio>
+
+<button id="musicBtn" onclick="toggleMusic()">🔊 Music</button>
+<div class="progress" id="progress"></div>
+
+<div id="app">
+<div class="screen">
+<div class="box" id="content">
+
+<div class="key">🗝️</div>
+<h1>ARSHU'S<br>TREASURE HUNT</h1>
+<p class="gold">20th Birthday Special</p>
+
+<p>
+Ek chhoti si journey hai... 👀<br>
+Kuch memories, kuch puzzles,<br>
+aur end mein ek treasure. 💎
+</p>
+
+<p class="small">
+Har clue dhyaan se solve karna,<br>
+warna mera bachaaa phas jayega 😂
+</p>
+
+<button onclick="start()">🔊 MUSIC ON & START</button>
+
+</div>
+</div>
+</div>
+
+<script>
+
+let level=0;
+let music=document.getElementById("music");
+
+function particles(){
+ for(let i=0;i<35;i++){
+  let p=document.createElement("div");
+  p.className="particle";
+  p.style.left=Math.random()*100+"vw";
+  p.style.animationDuration=(5+Math.random()*8)+"s";
+  p.style.animationDelay=Math.random()*5+"s";
+  document.body.appendChild(p);
+ }
+}
+particles();
+
+function start(){
+ music.play().catch(()=>{});
+ level=1;
+ showLevel();
+}
+
+function toggleMusic(){
+ if(music.paused){
+  music.play();
+  document.getElementById("musicBtn").innerText="🔊 Music";
+ }else{
+  music.pause();
+  document.getElementById("musicBtn").innerText="🔇 Music";
+ }
+}
+
+function update(){
+ document.getElementById("progress").innerText=
+ level<=7 ? "CHAABI "+level+" / 7" : "";
+}
+
+function showLevel(){
+ update();
+
+ let c=document.getElementById("content");
+
+ if(level===1){
+ c.innerHTML=`
+ <div class="key">🗝️</div>
+ <h2>CHAABI #1</h2>
+ <p>Humari legendary starting wali condition yaad hai? 👀</p>
+ <p class="gold"><b>Kitne hours ki acting thi?</b></p>
+ <input id="ans" type="text" placeholder="Type your answer...">
+ <br><button onclick="check1()">UNLOCK 🔐</button>
+ <p id="msg"></p>`;
+ }
+
+ if(level===2){
+ c.innerHTML=`
+ <div class="key">🗝️</div>
+ <h2>CHAABI #2</h2>
+ <p>Ek naam tune diya...</p>
+ <p>aur uska female version mujhe mil gaya 😂🐶</p>
+ <input id="ans" type="text" placeholder="Kutta / Kuttii...">
+ <br><button onclick="check2()">UNLOCK 🔐</button>
+ <p id="msg"></p>`;
+ }
+
+ if(level===3){
+ c.innerHTML=`
+ <div class="key">🗝️</div>
+ <h2>CHAABI #3</h2>
+ <p>Oyee buddhu raam 😭😂</p>
+ <p>Starting mein tujhe mera <b>real name</b> properly pata hi nahi tha.</p>
+ <p class="gold">Kya confusion thi?</p>
+ <input id="ans" type="text" placeholder="Type your answer...">
+ <br><button onclick="check3()">UNLOCK 🔐</button>
+ <p id="msg"></p>`;
+ }
+
+ if(level===4){
+ c.innerHTML=`
+ <div class="key">🗝️</div>
+ <h2>CHAABI #4</h2>
+ <p>Ab aaya woh legendary jealousy wala kaand 👀😂</p>
+ <p>Fake ID wali ladki ka naam kya tha?</p>
+ <input id="ans" type="text" placeholder="Type the name...">
+ <br><button onclick="check4()">UNLOCK 🔐</button>
+ <p id="msg"></p>`;
+ }
+
+ if(level===5){
+ c.innerHTML=`
+ <div class="key">🕵🏻</div>
+ <h2>WHO IS THIS IDIOT?</h2>
+ <p>Clues dhyaan se padh cutu 👀</p>
+ <p>
+ 🍗 Biryani ka fan<br>
+ 🐶 Ek questionable nickname mila<br>
+ ⏰ 24-hour trial hua<br>
+ 👀 Fake ID se jealousy kaand bhi hua
+ </p>
+ <p class="gold"><b>Ye kaun hai?</b></p>
+ <button class="choice" onclick="next()">Arshu — mera budhhu raam 😂</button>
+ <button class="choice" onclick="wrong()">Koi innocent ladka 😇</button>
+ <button class="choice" onclick="wrong()">Koi random banda</button>
+ <p id="msg"></p>`;
+ }
+
+ if(level===6){
+ c.innerHTML=`
+ <div class="key">📦</div>
+ <h2>LOCKED PARCEL</h2>
+ <p>Oyee bbyyy, parcel mil gaya 👀</p>
+
+ <p class="gold"><b>LOCK 1 — UNSCRAMBLE 🧩</b></p>
+ <p>VERE • RFOE • VUDIR • SHA</p>
+
+ <input id="ans" type="text"
+ placeholder="Type the secret phrase...">
+ <br>
+ <button onclick="check6a()">OPEN LOCK 1 🔐</button>
+ <p id="msg"></p>
+
+ <div id="lock2" class="hidden">
+ <hr style="border-color:#594522">
+ <p class="gold"><b>LOCK 2 — SAME WORD 💌</b></p>
+ <p>
+ Oyee mera ________ 🫶🏻<br>
+ Kya kar raha hai mera ________ 😂<br>
+ Jaldi idhar aa ________ 😭
+ </p>
+ <input id="ans2" type="text" placeholder="Same word...">
+ <br>
+ <button onclick="check6b()">OPEN LOCK 2 🔐</button>
+ <p id="msg2"></p>
+ </div>`;
+ }
+
+ if(level===7){
+ c.innerHTML=`
+ <div class="key">💎</div>
+ <h2>FINAL LEVEL</h2>
+ <p>RUKKKO bbyyy 😭✋🏻</p>
+ <p>Itni jaldi treasure chahiye?</p>
+
+ <p class="gold">
+ <b>
+ Humari itni saari memories mein...<br>
+ hum dono ki sabse favourite cheez kya hai? 🥹🫶🏻
+ </b>
+ </p>
+
+ <input id="ans" type="text"
+ placeholder="Type your answer...">
+ <br>
+ <button onclick="check7()">OPEN THE TREASURE 🔐</button>
+ <p id="msg"></p>`;
+ }
+}
+
+function normalize(x){
+ return x.toLowerCase()
+ .replace(/[^\w\s]/g,"")
+ .replace(/\s+/g," ")
+ .trim();
+}
+
+function correct(){
+ document.getElementById("msg").innerHTML=
+ `<span class="correct">🔓 LOCK KHUL GAYA! 🗝️🥹</span>`;
+ setTimeout(()=>{
+  level++;
+  showLevel();
+ },900);
+}
+
+function wrong(){
+ document.getElementById("msg").innerHTML=
+ `<span class="wrong">Areee bbyyy 😭😂 phir se soch!</span>`;
+}
+
+function check1(){
+ let a=normalize(document.getElementById("ans").value);
+ if(a==="24"||a==="24 hours"||a==="24 hour") correct();
+ else wrong();
+}
+
+function check2(){
+ let a=normalize(document.getElementById("ans").value);
+ if(a.includes("kutta")&&a.includes("kuttii")) correct();
+ else wrong();
+}
+
+function check3(){
+ let a=normalize(document.getElementById("ans").value);
+ if(a.includes("divya")&&a.includes("divyanshi")) correct();
+ else wrong();
+}
+
+function check4(){
+ let a=normalize(document.getElementById("ans").value);
